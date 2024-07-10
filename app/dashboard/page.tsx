@@ -1,27 +1,24 @@
 "use client"
-import { SignedIn, UserButton } from "@clerk/nextjs";
-import { clerkClient } from "@clerk/nextjs/server";
 import { useEffect, useState } from "react";
+import { SignedIn, UserButton } from "@clerk/nextjs";
+import supabase from "@/utils/supabase/server";
 
 // Dashboard component definition
 const Dashboard = () => {
-    //list of users
-    const [fetchUsers,setFetchUsers] = useState([null]);
+    const [chats, setChats] = useState([null]);
 
     useEffect(() => {
-        const fetchUsersFromClerk = async () => {
-            try {
-                const response = await clerkClient.users.getUserList();
-                
-                console.log(response);
-                
-                // setFetchUsers(response.data);
-            } catch (error) {
-                console.error("Error fetching users:", error);
+        const fetchChatsFromDB = async () => {
+            const { data, error } = await supabase.from('chats').select('*');
+            if (error) {
+                console.log(error)
+            }
+            else {
+                console.log(data)
+                setChats(data);
             }
         };
-        
-        fetchUsersFromClerk();
+        fetchChatsFromDB();
     }, []);
 
     // List of chat items
